@@ -15,5 +15,3 @@ export interface SheetConfig {
 }
 
 export type ConnectionStatus = 'CONNECTED' | 'FALLBACK' | 'CONNECTING' | 'ERROR';
-
-export type ActiveTab = 'search' | 'code' | 'settings';

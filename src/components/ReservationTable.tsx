@@ -9,6 +9,29 @@ const TEACHERS = [
   '김명희 선생님', '이미라 선생님', '하진성 선생님', '이동규 선생님', '조한정 선생님', '유현수 선생님'
 ];
 
+const renderReserver = (reserver: string) => {
+  const match = reserver.trim().match(/^(\d+)\s*(.+)$/);
+  if (match) {
+    const studentId = match[1];
+    const name = match[2];
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <span className="bg-indigo-600 text-white font-mono text-[10px] sm:text-[11px] px-2 py-0.5 rounded-md font-bold shadow-2xs">
+          {studentId}
+        </span>
+        <span className="font-bold text-slate-900 text-xs sm:text-sm bg-yellow-100/70 px-1.5 py-0.5 rounded-sm border-b border-yellow-400">
+          {name}
+        </span>
+      </span>
+    );
+  }
+  return (
+    <span className="font-bold text-slate-900 text-xs sm:text-sm bg-yellow-100/70 px-1.5 py-0.5 rounded-sm border-b border-yellow-400">
+      {reserver}
+    </span>
+  );
+};
+
 interface Props {
   data: Reservation[];
   onRefresh: () => void;
@@ -301,7 +324,7 @@ export default function ReservationTable({ data, onRefresh, isLoading, isMock, e
                       {item.expert}
                     </td>
                     <td className="py-4.5 px-5 text-xs font-medium text-slate-700">
-                      {item.reserver}
+                      {renderReserver(item.reserver)}
                     </td>
                     <td className="py-4.5 px-5 text-xs text-slate-500 font-mono">
                       {item.date}
@@ -311,8 +334,8 @@ export default function ReservationTable({ data, onRefresh, isLoading, isMock, e
                         {item.startTime} ~ {item.endTime}
                       </span>
                     </td>
-                    <td className="py-4.5 px-5 text-xs text-blue-700 font-bold">
-                      <span className="bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100/40">
+                    <td className="py-4.5 px-5 text-xs text-slate-600 font-medium">
+                      <span className="bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
                         {item.subject}
                       </span>
                     </td>
@@ -343,18 +366,21 @@ export default function ReservationTable({ data, onRefresh, isLoading, isMock, e
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                       <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">{item.expert}</span>
                       <span className="text-slate-300 flex-shrink-0">|</span>
-                      <span className="text-xs sm:text-sm text-slate-500 font-medium truncate">예약자: {item.reserver}</span>
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="text-xs text-slate-400 font-medium">예약자:</span>
+                        {renderReserver(item.reserver)}
+                      </div>
                     </div>
                     <span className="text-[10px] sm:text-xs text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100 flex-shrink-0">
                       {item.date}
                     </span>
                   </div>
 
-                  <div className="text-xs sm:text-sm font-bold text-blue-700">
-                    <span className="bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-100/30">
+                  <div className="text-xs sm:text-sm font-medium text-slate-600">
+                    <span className="bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">
                       {item.subject}
                     </span>
                   </div>
@@ -415,7 +441,7 @@ export default function ReservationTable({ data, onRefresh, isLoading, isMock, e
                   <span className="text-xs font-bold text-slate-400">예약자 성명</span>
                   <span className="text-xs font-bold text-slate-900 col-span-2 flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-blue-600" />
-                    {selectedItem.reserver}
+                    {renderReserver(selectedItem.reserver)}
                   </span>
                 </div>
 
@@ -437,8 +463,8 @@ export default function ReservationTable({ data, onRefresh, isLoading, isMock, e
 
                 <div className="grid grid-cols-3 py-1.5 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-400">상담 구분</span>
-                  <span className="text-xs font-bold text-blue-700 col-span-2 flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-xs font-semibold text-slate-700 col-span-2 flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-slate-400" />
                     {selectedItem.subject}
                   </span>
                 </div>

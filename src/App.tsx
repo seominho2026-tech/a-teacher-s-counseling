@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Reservation, SheetConfig, ConnectionStatus, ActiveTab } from './types';
+import { Reservation, SheetConfig, ConnectionStatus } from './types';
 import { MOCK_RESERVATIONS } from './mockData';
 import ReservationTable from './components/ReservationTable';
-import SpreadsheetSettings from './components/SpreadsheetSettings';
-import CodeViewer from './components/CodeViewer';
-import { CalendarRange, Search, FileCode, Settings } from 'lucide-react';
+import { CalendarRange } from 'lucide-react';
 
 const DEFAULT_CONFIG: SheetConfig = {
   spreadsheetId: '14hj-AkF2fbPQ3rB90j1YbYGl7zoDShw_YSDiZ3xM1WY',
@@ -12,17 +10,15 @@ const DEFAULT_CONFIG: SheetConfig = {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('search');
-  const [config, setConfig] = useState<SheetConfig>(DEFAULT_CONFIG);
   const [status, setStatus] = useState<ConnectionStatus>('CONNECTING');
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const fetchSheetData = useCallback(async (targetConfig?: SheetConfig) => {
+  const fetchSheetData = useCallback(async () => {
     setStatus('CONNECTING');
     setErrorMessage(null);
     try {
-      const { spreadsheetId, sheetName } = targetConfig || config;
+      const { spreadsheetId, sheetName } = DEFAULT_CONFIG;
       const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
       
       const response = await fetch(url);
@@ -122,22 +118,18 @@ export default function App() {
       setReservations(MOCK_RESERVATIONS);
       setStatus('FALLBACK');
     }
-  }, [config]);
+  }, []);
 
-  // Fetch on mount or when config changes
+  // Fetch on mount
   useEffect(() => {
-    fetchSheetData(config);
-  }, [fetchSheetData, config]);
-
-  const handleRefresh = () => {
-    fetchSheetData(config);
-  };
+    fetchSheetData();
+  }, [fetchSheetData]);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
       {/* Premium Top Navigation */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 sm:py-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
               <CalendarRange className="w-5.5 h-5.5" />
@@ -147,71 +139,18 @@ export default function App() {
               <span className="text-[10px] text-slate-400 font-medium block">Google Sheets Live Connected</span>
             </div>
           </div>
-
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-1 border-b sm:border-b-0 border-slate-100 pb-2 sm:pb-0">
-            <button
-              onClick={() => setActiveTab('search')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'search'
-                  ? 'bg-blue-50 text-blue-700 border border-blue-100/40'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 border border-transparent'
-              }`}
-            >
-              <Search className="w-3.5 h-3.5" />
-              예약 현황 조회
-            </button>
-            <button
-              onClick={() => setActiveTab('code')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'code'
-                  ? 'bg-blue-50 text-blue-700 border border-blue-100/40'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 border border-transparent'
-              }`}
-            >
-              <FileCode className="w-3.5 h-3.5" />
-              Apps Script 소스코드
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'settings'
-                  ? 'bg-blue-50 text-blue-700 border border-blue-100/40'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 border border-transparent'
-              }`}
-            >
-              <Settings className="w-3.5 h-3.5" />
-              연동 설정
-            </button>
-          </div>
         </div>
       </header>
 
       {/* Main Container Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'search' && (
-          <ReservationTable
-            data={reservations}
-            onRefresh={handleRefresh}
-            isLoading={status === 'CONNECTING'}
-            isMock={status === 'FALLBACK'}
-            errorMessage={errorMessage}
-          />
-        )}
-        
-        {activeTab === 'code' && (
-          <CodeViewer />
-        )}
-
-        {activeTab === 'settings' && (
-          <SpreadsheetSettings
-            config={config}
-            status={status}
-            onSave={(newConfig) => setConfig(newConfig)}
-            onReset={() => setConfig(DEFAULT_CONFIG)}
-            errorMsg={errorMessage}
-          />
-        )}
+        <ReservationTable
+          data={reservations}
+          onRefresh={fetchSheetData}
+          isLoading={status === 'CONNECTING'}
+          isMock={status === 'FALLBACK'}
+          errorMessage={errorMessage}
+        />
       </main>
 
       {/* Humble Elegant Footer */}
