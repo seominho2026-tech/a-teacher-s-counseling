@@ -1,0 +1,8 @@
+{
+  "name": "Remix: 상담 예약 조회 시스템",
+  "description": "구글 스프레드시트의 예약 데이터를 실시간으로 조회하고 검색하는 반응형 웹앱 및 Google Apps Script 소스 코드 제공 도구",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
